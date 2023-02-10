@@ -184,6 +184,8 @@ namespace casadi {
     /// Get all statistics
     Dict get_stats(void* mem) const override;
 
+    virtual bool _set_options(void* mem, const Dict& opts);
+
     ///@{
     /** \brief Generate a function that calculates forward mode derivatives */
     bool has_forward(casadi_int nfwd) const override { return true;}

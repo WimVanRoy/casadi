@@ -309,6 +309,12 @@ namespace casadi {
     return stats;
   }
 
+  bool OracleFunction::_set_options(void *mem, const Dict& opts) {
+    bool result = FunctionInternal::_set_options(mem, opts);
+    //auto m = static_cast<OracleMemory*>(mem);
+    return result;
+  }
+
   int OracleFunction::init_mem(void* mem) const {
     if (ProtoFunction::init_mem(mem)) return 1;
     if (!mem) return 1;

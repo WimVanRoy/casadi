@@ -2585,6 +2585,10 @@ namespace casadi {
     return stats;
   }
 
+  bool ProtoFunction::_set_options(void* mem, const Dict& opts) {
+    return false;
+  }
+
   bool FunctionInternal::has_derivative() const {
     return enable_forward_ || enable_reverse_ || enable_jacobian_ || enable_fd_;
   }

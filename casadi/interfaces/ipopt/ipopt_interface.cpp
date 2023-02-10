@@ -470,6 +470,70 @@ namespace casadi {
     return 0;
   }
 
+  bool IpoptInterface::_set_options(void* mem, const Dict& opts_) {
+    auto m = static_cast<IpoptMemory*>(mem);
+    Ipopt::SmartPtr<Ipopt::IpoptApplication> *app =
+      static_cast<Ipopt::SmartPtr<Ipopt::IpoptApplication>*>(m->app);
+
+    // Get all options available in (s)IPOPT
+    auto regops = (*app)->RegOptions()->RegisteredOptionsList();
+
+    Dict options = Options::sanitize(opts_);
+    // Replace resto group with prefixes
+    auto it = options.find("resto");
+    if (it!=options.end()) {
+      Dict resto_options = it->second;
+      options.erase(it);
+      for (auto&& op : resto_options) {
+        options["resto." + op.first] = op.second;
+      }
+    }
+
+    // Pass all the options to ipopt
+    bool succes = true;
+    for (auto&& op : options) {
+
+      // There might be options with a resto prefix.
+      std::string option_name = op.first;
+      if (startswith(option_name, "resto.")) {
+        option_name = option_name.substr(6);
+      }
+
+      // Find the option
+      auto regops_it = regops.find(option_name);
+      if (regops_it==regops.end()) {
+        casadi_error("No such IPOPT option: " + op.first);
+      }
+
+      // Get the type
+      Ipopt::RegisteredOptionType ipopt_type = regops_it->second->Type();
+
+      // Pass to IPOPT
+      bool ret = true;
+      switch (ipopt_type) {
+      case Ipopt::OT_Number:
+        ret = (*app)->Options()->SetNumericValue(op.first, op.second.to_double(), false);
+        break;
+      case Ipopt::OT_Integer:
+        ret = (*app)->Options()->SetIntegerValue(op.first, op.second.to_int(), false);
+        break;
+      case Ipopt::OT_String:
+        ret = (*app)->Options()->SetStringValue(op.first, op.second.to_string(), false);
+        break;
+      case Ipopt::OT_Unknown:
+      default:
+        casadi_warning("Cannot handle option \"" + op.first + "\", ignored");
+        continue;
+      }
+
+      if (!ret) {
+        succes = false;
+      }
+    }
+
+    return succes;
+  }
+
   bool IpoptInterface::
   intermediate_callback(IpoptMemory* m, const double* x, const double* z_L, const double* z_U,
                         const double* g, const double* lambda, double obj_value, int iter,

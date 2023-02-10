@@ -148,6 +148,9 @@ namespace casadi {
     /// Get all statistics
     Dict get_stats(void* mem) const override;
 
+    /// Get all statistics
+    bool _set_options(void* mem, const Dict& options) override;
+
     /** \brief Serialize an object without type information */
     void serialize_body(SerializingStream &s) const override;
 

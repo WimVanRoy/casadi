@@ -841,6 +841,10 @@ namespace casadi {
     return (*this)->get_stats(memory(mem));
   }
 
+  bool Function::set_options(const Dict& opts, int mem) {
+    return (*this)->_set_options(memory(mem), opts);
+  }
+
   const Sparsity Function::
   sparsity_jac(casadi_int iind, casadi_int oind, bool compact, bool symmetric) const {
     try {

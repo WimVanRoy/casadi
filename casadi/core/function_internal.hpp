@@ -140,6 +140,9 @@ namespace casadi {
     /// Get all statistics
     virtual Dict get_stats(void* mem) const;
 
+    /// Set options
+    virtual bool _set_options(void* mem, const Dict& opts);
+
     /** \brief Clear all memory (called from destructor) */
     void clear_mem();
 

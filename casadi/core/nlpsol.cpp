@@ -979,6 +979,10 @@ namespace casadi {
     return stats;
   }
 
+  bool Nlpsol::_set_options(void* mem, const Dict& opts) {
+    return false;
+  }
+
   void Nlpsol::nlpsol_codegen_body(CodeGenerator& g) const {
     g.local("d_nlp", "struct casadi_nlpsol_data");
     g.local("p_nlp", "struct casadi_nlpsol_prob");

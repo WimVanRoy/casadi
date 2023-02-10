@@ -150,6 +150,9 @@ namespace casadi {
     // Solve the NLP
     int solve(void* mem) const override;
 
+	// Adapt options
+    bool _set_options(void* mem, const Dict& opts) override;
+
     /// Exact Hessian?
     bool exact_hessian_;
 

@@ -770,6 +770,9 @@ namespace casadi {
     /// Get all statistics obtained at the end of the last evaluate call
     Dict stats(int mem=0) const;
 
+    /** Experimental set options */
+    bool set_options(const Dict& opts, int mem=0);
+
     ///@{
     /** \brief Get symbolic primitives equivalent to the input expressions
      * There is no guarantee that subsequent calls return unique answers
