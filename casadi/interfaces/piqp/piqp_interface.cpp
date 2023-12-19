@@ -49,7 +49,7 @@ namespace casadi {
 
   PiqpInterface::PiqpInterface(const std::string& name,
                                    const std::map<std::string, Sparsity>& st)
-    : Conic(name, st) {
+    : Conic(name, st), sparse_backend(true) {
 
     has_refcount_ = true;
   }
@@ -81,55 +81,70 @@ namespace casadi {
       if (op.first=="warm_start_primal") {
       } else if (op.first=="warm_start_dual") {
       } else if (op.first=="piqp") {
-        // const Dict& opts = op.second;
-        // for (auto&& op : opts) {
-        //   if (op.first=="rho") {
-        //     settings_.rho = op.second;
-        //   } else if (op.first=="sigma") {
-        //     settings_.sigma = op.second;
-        //   } else if (op.first=="scaling") {
-        //     settings_.scaling = op.second;
-        //   } else if (op.first=="adaptive_rho") {
-        //     settings_.adaptive_rho = op.second;
-        //   } else if (op.first=="adaptive_rho_interval") {
-        //     settings_.adaptive_rho_interval = op.second;
-        //   } else if (op.first=="adaptive_rho_tolerance") {
-        //     settings_.adaptive_rho_tolerance = op.second;
-        //   //} else if (op.first=="adaptive_rho_fraction") {
-        //   //  settings_.adaptive_rho_fraction = op.second;
-        //   } else if (op.first=="max_iter") {
-        //     settings_.max_iter = op.second;
-        //   } else if (op.first=="eps_abs") {
-        //     settings_.eps_abs = op.second;
-        //   } else if (op.first=="eps_rel") {
-        //     settings_.eps_rel = op.second;
-        //   } else if (op.first=="eps_prim_inf") {
-        //     settings_.eps_prim_inf = op.second;
-        //   } else if (op.first=="eps_dual_inf") {
-        //     settings_.eps_dual_inf = op.second;
-        //   } else if (op.first=="alpha") {
-        //     settings_.alpha = op.second;
-        //   } else if (op.first=="delta") {
-        //     settings_.delta = op.second;
-        //   } else if (op.first=="polish") {
-        //     settings_.polish = op.second;
-        //   } else if (op.first=="polish_refine_iter") {
-        //     settings_.polish_refine_iter = op.second;
-        //   } else if (op.first=="verbose") {
-        //     settings_.verbose = op.second;
-        //   } else if (op.first=="scaled_termination") {
-        //     settings_.scaled_termination = op.second;
-        //   } else if (op.first=="check_termination") {
-        //     settings_.check_termination = op.second;
-        //   } else if (op.first=="warm_start") {
-        //     casadi_error("PIQP's warm_start option is impure and therefore disabled. "
-        //                  "Use CasADi options 'warm_start_primal' and 'warm_start_dual' instead.");
-        //   //} else if (op.first=="time_limit") {
-        //   //  settings_.time_limit = op.second;
-        //   } else {
-        //     casadi_error("Not recognised");
-        //   }
-        // }
+        const Dict& opts = op.second;
+        for (auto&& op : opts) {
+			if (op.first == "rho_init") {
+				settings_.rho_init = op.second;
+			} else if (op.first == "delta_init") {
+				settings_.delta_init = op.second;
+			} else if (op.first == "eps_abs") {
+				settings_.eps_abs = op.second;
+			} else if (op.first == "eps_rel") {
+				settings_.eps_rel = op.second;
+			} else if (op.first == "check_duality_gap") {
+				settings_.check_duality_gap = op.second;
+			} else if (op.first == "eps_duality_gap_abs") {
+				settings_.eps_duality_gap_abs = op.second;
+			} else if (op.first == "eps_duality_gap_rel") {
+				settings_.eps_duality_gap_rel = op.second;
+			} else if (op.first == "reg_lower_limit") {
+				settings_.reg_lower_limit = op.second;
+			} else if (op.first == "reg_finetune_lower_limit") {
+				settings_.reg_finetune_lower_limit = op.second;
+			} else if (op.first == "reg_finetune_primal_update_threshold") {
+				settings_.reg_finetune_primal_update_threshold = static_cast<piqp::isize>(op.second.to_int());
+			} else if (op.first == "reg_finetune_dual_update_threshold") {
+				settings_.reg_finetune_dual_update_threshold = static_cast<piqp::isize>(op.second.to_int());
+			} else if (op.first == "max_iter") {
+				settings_.max_iter = static_cast<piqp::isize>(op.second.to_int());
+			} else if (op.first == "max_factor_retires") {
+				settings_.max_factor_retires = static_cast<piqp::isize>(op.second.to_int());
+			} else if (op.first == "preconditioner_scale_cost") {
+				settings_.preconditioner_scale_cost = op.second;
+			} else if (op.first == "preconditioner_iter") {
+				settings_.preconditioner_iter = static_cast<piqp::isize>(op.second.to_int());
+			} else if (op.first == "tau") {
+				settings_.tau = op.second;
+			} else if (op.first == "iterative_refinement_always_enabled") {
+				settings_.iterative_refinement_always_enabled = op.second;
+			} else if (op.first == "iterative_refinement_eps_abs") {
+				settings_.iterative_refinement_eps_abs = op.second;
+			} else if (op.first == "iterative_refinement_eps_rel") {
+				settings_.iterative_refinement_eps_rel = op.second;
+			} else if (op.first == "iterative_refinement_max_iter") {
+				settings_.iterative_refinement_max_iter = static_cast<piqp::isize>(op.second.to_int());
+			} else if (op.first == "iterative_refinement_min_improvement_rate") {
+				settings_.iterative_refinement_min_improvement_rate = op.second;
+			} else if (op.first == "iterative_refinement_static_regularization_eps") {
+				settings_.iterative_refinement_static_regularization_eps = op.second;
+			} else if (op.first == "iterative_refinement_static_regularization_rel") {
+				settings_.iterative_refinement_static_regularization_rel = op.second;
+			} else if (op.first == "verbose") {
+				settings_.verbose = op.second;
+			} else if (op.first == "compute_timings") {
+				settings_.compute_timings = op.second;
+            } else if (op.first=="backend") {
+              if (op.second == "sparse") {
+                sparse_backend = true;
+              } else if (op.second == "dense") {
+                sparse_backend = false;
+              } else {
+                casadi_error("[Backend option] Please specify either sparse or dense");
+              }
+			} else {
+			  casadi_error("Not recognised");
+			}
+		}
       }
     }
 
@@ -218,23 +233,24 @@ namespace casadi {
       //     equality and inequality   [i, e, e, e, i, i, i, e]
       //     lhs_equals_rgs_contraint  [f, t, t, t, f, f, f, t]
       //     number_of_prev_equality   [0, 0, 1, 3, 3, 3, 3, 3]
-      //     number_of_prev_inequality [0, 1, 1, 1, 1, 2, 3, 4]
+      //     number_of_prev_lb_inequality [0, 1, 1, 1, 1, 2, 3, 4]
+      //     number_of_prev_ub_inequality [0, 1, 1, 1, 1, 2, 3, 4]
       for (std::size_t k=1; k<lhs_equals_rhs_constraint.size(); ++k) {
         if (lhs_equals_rhs_constraint[k-1]) {
           number_of_prev_equality[k] = number_of_prev_equality[k-1] + 1;
           number_of_prev_lb_inequality[k] = number_of_prev_lb_inequality[k-1];
           number_of_prev_ub_inequality[k] = number_of_prev_ub_inequality[k-1];
         } else {
-          number_of_prev_equality[k] = number_of_prev_equality[k-1] + 1;
-          if (lhs_is_inf[k]) {
-              number_of_prev_lb_inequality[k] = number_of_prev_lb_inequality[k-1];
-          } else {
+          number_of_prev_equality[k] = number_of_prev_equality[k-1];
+          if (!lhs_is_inf[k]) {
               number_of_prev_lb_inequality[k] = number_of_prev_lb_inequality[k-1] +1;
-          }
-          if (rhs_is_inf[k]) {
-              number_of_prev_ub_inequality[k] = number_of_prev_ub_inequality[k-1];
           } else {
+              number_of_prev_lb_inequality[k] = number_of_prev_lb_inequality[k-1];
+          }
+          if (!rhs_is_inf[k]) {
               number_of_prev_ub_inequality[k] = number_of_prev_ub_inequality[k-1] +1;
+          } else {
+              number_of_prev_ub_inequality[k] = number_of_prev_ub_inequality[k-1];
           }
         }
       }
@@ -271,8 +287,8 @@ namespace casadi {
       }
     }
     std::size_t n_eq = m->eq_b_vector.size();
+    std::size_t n_ineq_ub = m->uba_vector.size();
     std::size_t n_ineq_lb = m->lba_vector.size();
-    std::size_t n_ineq_ub = m->lbx_vector.size();
     std::size_t n_ineq = n_ineq_lb + n_ineq_ub;
 
     // Convert H_ from casadi::Sparsity to Eigen::SparseMatrix (misuse tripletList)
@@ -301,7 +317,7 @@ namespace casadi {
           static_cast<double>(A[k])));
       } else {
         // Inequality constraint the row[k] is decreased by the number of previous equality constraints
-		  if (!lhs_is_inf[m->row[k]]) {
+		  if (!rhs_is_inf[m->row[k]]) {
 			m->tripletList.push_back(TripletT(
 			  static_cast<double>(number_of_prev_ub_inequality[m->row[k]]),
 			  static_cast<double>(m->col[k]),
@@ -327,86 +343,98 @@ namespace casadi {
 
     // Get stacked lower and upper inequality bounds
     m->ineq_b_vector.resize(n_ineq);
-    m->ineq_b_vector << m->uba_vector, -m->lbx_vector;
+    m->ineq_b_vector << m->uba_vector, -m->lba_vector;
 
     m->fstats.at("preprocessing").toc();
 
     // Solve Problem
     m->fstats.at("solver").tic();
-    // TODO: if (m->ubx_vector.size() > 0 || m->lbx_vector.size() > 0) {
-	//
+	bool sparse_backend = true;
     if (sparse_backend) {
 		piqp::SparseSolver<double> solver;
 		solver.settings() = settings_;
 
-		solver.setup(P, c, A, b, G, h, x_lb, x_ub);
+		solver.setup(
+			H_spa, m->g_vector,
+			A_spa, m->eq_b_vector,
+			C_spa, m->ineq_b_vector,
+			m->lbx_vector, m->ubx_vector
+		);
 		m->status = solver.solve();
 
-		m->results_x = std::make_unique<Eigen::VectorXd>(solver.results().x);
-		m->results_y = std::make_unique<Eigen::VectorXd>(solver.results().y);
-		m->results_z = std::make_unique<Eigen::VectorXd>(solver.results().z);
-		m->objValue = solver.results().info.primal_obj;
+		m->results_x = std::make_unique<Eigen::VectorXd>(solver.result().x);
+		m->results_y = std::make_unique<Eigen::VectorXd>(solver.result().y);
+		m->results_z = std::make_unique<Eigen::VectorXd>(solver.result().z);
+		m->results_lam_x = std::make_unique<Eigen::VectorXd>(
+			solver.result().z_ub -
+			solver.result().z_lb
+		);
+		m->objValue = solver.result().info.primal_obj;
     } else {
 		piqp::DenseSolver<double> solver;
 		solver.settings() = settings_;
-		// TODO
-		//  m->dense_solver = proxsuite::proxqp::dense::QP<double> (nx_, n_eq, n_ineq);
-		//  m->dense_solver.init(Eigen::MatrixXd(H_spa), m->g_vector,
-		//	Eigen::MatrixXd(A_spa), m->b_vector,
-		//	Eigen::MatrixXd(C_spa), m->lb_vector, m->ub_vector);
-		//  m->dense_solver.settings = settings_;
-
-		//  m->dense_solver.solve();
-
+		solver.setup(
+			Eigen::MatrixXd(H_spa), m->g_vector,
+			Eigen::MatrixXd(A_spa), m->eq_b_vector,
+			Eigen::MatrixXd(C_spa), m->ineq_b_vector,
+			m->lbx_vector, m->ubx_vector
+		);
 		m->status = solver.solve();
 
-		m->results_x = std::make_unique<Eigen::VectorXd>(solver.results().x);
-		m->results_y = std::make_unique<Eigen::VectorXd>(solver.results().y);
-		m->results_z = std::make_unique<Eigen::VectorXd>(solver.results().z);
-		m->objValue = solver.results().info.primal_obj;
+		m->results_x = std::make_unique<Eigen::VectorXd>(solver.result().x);
+		m->results_y = std::make_unique<Eigen::VectorXd>(solver.result().y);
+		m->results_z = std::make_unique<Eigen::VectorXd>(solver.result().z);
+		m->results_lam_x = std::make_unique<Eigen::VectorXd>(
+			solver.result().z_ub -
+			solver.result().z_lb
+		);
+		m->objValue = solver.result().info.primal_obj;
     }
     m->fstats.at("solver").toc();
 
-    // Outputs
-    double *x=res[CONIC_X],
-           *cost=res[CONIC_COST],
-           *lam_a=res[CONIC_LAM_A],
-           *lam_x=res[CONIC_LAM_X];
+    // Post-processing to retrieve the results
+    m->fstats.at("postprocessing").tic();
+    casadi_copy(m->results_x->data(), nx_, res[CONIC_X]);
+    casadi_copy(m->results_lam_x->data(), nx_, res[CONIC_LAM_X]);
 
-    int ret;
+    // Copy back the multipliers.
+    // Note, casadi has LAM_X (multipliers for constraints on variable x) and
+    // LAM_A (multipliers for in- and equality constraints) while proxqp has results_y
+    // (equality multipliers) and results_z (inequality multipliers).
+    if (n_ineq + n_eq > 0) {
+        Eigen::VectorXd lam_a(na_);
 
-	//	piqp_update_dense(m->work,
-	//                      h, g,
-	//                      nullptr, nullptr,
-	//                      A, uba,
-	//					  lbx, ubx);
-	//
+		for (int k=0; k<lhs_equals_rhs_constraint.size(); ++k) {
+		  if (lhs_equals_rhs_constraint[k]) {
+		    lam_a[k] = m->results_y->coeff(number_of_prev_equality[k]);
+		  } else {
+			lam_a[k] = 0;
+			  if (!lhs_is_inf[m->row[k]]) {
+				lam_a[k] += m->results_z->coeff(number_of_prev_ub_inequality[k]);
+			  }
+			  if (!lhs_is_inf[m->row[k]]) {
+				lam_a[k] -= m->results_z->coeff(number_of_prev_ub_inequality[k]);
+			  }
+		  }
+		}
+		casadi_copy(lam_a.data(), na_, res[CONIC_LAM_A]);
+    }
 
-    // if (warm_start_primal_) {
-    //   ret = piqp_warm_start_x(m->work, arg[CONIC_X0]);
-    //   casadi_assert(ret==0, "Problem in piqp_warm_start_x");
-    // }
+    if (res[CONIC_COST]) {
+      *res[CONIC_COST] = m->objValue;
+    }
 
-    // if (warm_start_dual_) {
-    //   casadi_copy(arg[CONIC_LAM_X0], nx_, w);
-    //   casadi_copy(arg[CONIC_LAM_A0], na_, w+nx_);
-    //   ret = piqp_warm_start_y(m->work, w);
-    //   casadi_assert(ret==0, "Problem in piqp_warm_start_y");
-    // }
-
-    // Solve Problem
-    // ret = piqp_solve(m->work);
-    // casadi_assert(ret==0, "Problem in piqp_solve");
-
-    // casadi_copy(m->work->result->x, nx_, res[CONIC_X]);
-	// // TODO: Reconstruct: z_ub, z_lb, y and z!
-    // casadi_copy(m->work->result->z_lb, nx_, res[CONIC_LAM_X]);
-    // casadi_copy(m->work->result->z, na_, res[CONIC_LAM_A]);
-    // if (res[CONIC_COST]) *res[CONIC_COST] = m->work->result->info.primal_obj;
-	// // info.runtime
-
-    // m->success = (ret == PIQP_SOLVED);
-    // if (m->success) m->unified_return_status = SOLVER_RET_SUCCESS;
+    m->d_qp.success = m->status == piqp::Status::PIQP_SOLVED;
+    if (m->d_qp.success) {
+      m->d_qp.unified_return_status = SOLVER_RET_SUCCESS;
+    } else {
+      if (m->status == piqp::Status::PIQP_MAX_ITER_REACHED) {
+        m->d_qp.unified_return_status = SOLVER_RET_LIMITED;
+      } else { // primal or dual infeasibility
+        m->d_qp.unified_return_status = SOLVER_RET_UNKNOWN;
+      }
+    }
+    m->fstats.at("postprocessing").toc();
 
     return 0;
   }
@@ -541,8 +569,8 @@ namespace casadi {
   Dict PiqpInterface::get_stats(void* mem) const {
     Dict stats = Conic::get_stats(mem);
     auto m = static_cast<PiqpMemory*>(mem);
-	// TODO
-    //stats["return_status"] = m->work->info->status;
+
+    stats["return_status"] = piqp::status_to_string(m->status);
     return stats;
   }
 

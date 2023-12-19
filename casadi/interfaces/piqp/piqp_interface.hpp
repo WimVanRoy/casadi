@@ -64,6 +64,7 @@ namespace casadi {
 
     // Results
     std::unique_ptr<Eigen::VectorXd> results_x;
+    std::unique_ptr<Eigen::VectorXd> results_lam_x;
     std::unique_ptr<Eigen::VectorXd> results_y;
     std::unique_ptr<Eigen::VectorXd> results_z;
     double objValue;
@@ -142,7 +143,7 @@ namespace casadi {
 
     piqp::Settings<double> settings_;
 
-    bool warm_start_primal_, warm_start_dual_;
+    bool sparse_backend;
 
     /** \brief Generate code for the function body */
     void codegen_body(CodeGenerator& g) const override;
