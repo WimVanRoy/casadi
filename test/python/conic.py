@@ -87,6 +87,10 @@ if "SKIP_PROXQP_TESTS" not in os.environ and has_conic("proxqp"):
   conics.append(("proxqp",{"proxqp":{"eps_abs":1e-11,"max_iter":1e4, "backend": "sparse"}}, {"quadratic": True, "dual": True, "soc": False, "codegen": False,"discrete":False,"sos":False}))
   conics.append(("proxqp",{"proxqp":{"eps_abs":1e-11,"max_iter":1e4, "backend": "dense"}}, {"quadratic": True, "dual": True, "soc": False, "codegen": False,"discrete":False,"sos":False}))
 
+if "SKIP_PIQP_TESTS" not in os.environ and has_conic("piqp"):
+  conics.append(("piqp",{"piqp":{"backend": "sparse"}}, {"quadratic": True, "dual": True, "soc": False, "codegen": False,"discrete":False,"sos":False}))
+  conics.append(("piqp",{"piqp":{"backend": "dense"}}, {"quadratic": True, "dual": True, "soc": False, "codegen": False,"discrete":False,"sos":False}))
+
 if "SKIP_QPALM_TESTS" not in os.environ and has_conic("qpalm"):
   eps = 1e-8
   conics.append(("qpalm",{"qpalm":{"eps_abs":eps,"eps_rel":eps,"eps_abs_in":eps,"eps_prim_inf":eps}},{"quadratic": True, "dual": True, "soc": False, "codegen": False, "discrete": False, "sos":False}))

@@ -139,7 +139,7 @@ namespace casadi {
     Dict get_stats(void* mem) const override;
 
     // Number of nonzeros in upper part of Hessian
-    casadi_int nnzHupp_, nnzA_;
+    casadi_int nnzH_, nnzA_;
 
     piqp::Settings<double> settings_;
 
