@@ -63,12 +63,6 @@ namespace casadi {
      {{"piqp",
        {OT_DICT,
         "const Options to be passed to piqp."}},
-      {"warm_start_primal",
-       {OT_BOOL,
-        "Use x0 input to warmstart [Default: true]."}},
-      {"warm_start_dual",
-       {OT_BOOL,
-        "Use lam_a0 and lam_x0 input to warmstart [Default: truw]."}}
      }
   };
 
@@ -78,9 +72,7 @@ namespace casadi {
 
     // Read options
     for (auto&& op : opts) {
-      if (op.first=="warm_start_primal") {
-      } else if (op.first=="warm_start_dual") {
-      } else if (op.first=="piqp") {
+      if (op.first=="piqp") {
         const Dict& opts = op.second;
         for (auto&& op : opts) {
             if (op.first == "rho_init") {
@@ -252,12 +244,12 @@ namespace casadi {
           number_of_prev_ub_inequality[k] = number_of_prev_ub_inequality[k-1];
         } else {
           number_of_prev_equality[k] = number_of_prev_equality[k-1];
-          if (!lhs_is_inf[k]) {
+          if (!lhs_is_inf[k-1]) {
               number_of_prev_lb_inequality[k] = number_of_prev_lb_inequality[k-1] +1;
           } else {
               number_of_prev_lb_inequality[k] = number_of_prev_lb_inequality[k-1];
           }
-          if (!rhs_is_inf[k]) {
+          if (!rhs_is_inf[k-1]) {
               number_of_prev_ub_inequality[k] = number_of_prev_ub_inequality[k-1] +1;
           } else {
               number_of_prev_ub_inequality[k] = number_of_prev_ub_inequality[k-1];
@@ -508,7 +500,6 @@ namespace casadi {
     // g << "settings.verbose = " << settings_.verbose << ";\n";
     // g << "settings.scaled_termination = " << settings_.scaled_termination << ";\n";
     // g << "settings.check_termination = " << settings_.check_termination << ";\n";
-    // g << "settings.warm_start = " << settings_.warm_start << ";\n";
     // //g << "settings.time_limit = " << settings_.time_limit << ";\n";
 
     // g << codegen_mem(g) + " = piqp_setup(&data, &settings);\n";
@@ -554,11 +545,6 @@ namespace casadi {
     // g.comment("Pass Hessian and constraint matrices");
     // g << "if (piqp_update_P_A(work, w, 0, " + str(nnzHupp_) + ", w+" + str(nnzHupp_) +
     //      ", 0, " + str(nnzA_) + ")) return 1;\n";
-
-    // g << "if (piqp_warm_start_x(work, " + g.arg(CONIC_X0) + ")) return 1;\n";
-    // g.copy_default(g.arg(CONIC_LAM_X0), nx_, "w", "0", false);
-    // g.copy_default(g.arg(CONIC_LAM_A0), na_, "w+"+str(nx_), "0", false);
-    // g << "if (piqp_warm_start_y(work, w)) return 1;\n";
 
     // g << "if (piqp_solve(work)) return 1;\n";
 
